@@ -1,0 +1,32 @@
+name: Vavoo Otomatik Playlist
+
+on:
+  schedule:
+    - cron: '0 */6 * * *' # Her 6 saatte bir linkleri tazeler
+  workflow_dispatch: # İstediğinde manuel çalıştırman için
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kodları Çek
+        uses: actions/checkout@v3
+
+      - name: Python Hazırla
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Kütüphaneleri Yükle
+        run: pip install requests beautifulsoup4 lxml unidecode
+
+      - name: Scripti Başlat
+        run: python export_script.py
+
+      - name: Değişiklikleri Kaydet
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit -m "Vavoo listesi tazelendi: $(date)" || exit 0
+          git push
