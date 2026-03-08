@@ -1,0 +1,32 @@
+name: Vavoo Playlist Guncelle
+
+on:
+  schedule:
+    - cron: '0 */6 * * *' # Her 6 saatte bir otomatik çalışır
+  workflow_dispatch: # Manuel çalıştırma butonu
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Depoyu Kopyala
+      uses: actions/checkout@v3
+
+    - name: Python Kur
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Bagimliliklari Kur
+      run: pip install requests beautifulsoup4 lxml unidecode
+
+    - name: Scripti Calistir
+      run: python export_script.py
+
+    - name: Degisiklikleri Kaydet
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add .
+        git commit -m "Vavoo listesi güncellendi: $(date)" || exit 0
+        git push
